@@ -13,9 +13,9 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get("/", (req, res) => {
-  return res.redirect("/api/v1/docs/");
-});
+// app.get("/", (req, res) => {
+//   return res.redirect("/api/v1/docs/");
+// });
 
 app.use("/api/v1/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/api/v1/auth/", authRouter);
