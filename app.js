@@ -16,7 +16,22 @@ app.get("/", (req, res) => {
   return res.redirect("/api/v1/docs/");
 });
 
-app.use("/api/v1/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get("/api/v1/docs/swagger.json", (req, res) => {
+  return res.status(200).json(swaggerSpec);
+});
+
+app.use(
+  "/api/v1/docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    swaggerOptions: {
+      url: "/api/v1/docs/swagger.json",
+      validatorUrl: null,
+    },
+    explorer: true,
+  }),
+);
+
 app.use("/api/v1/auth/", authRouter);
 app.use("/api/v1/me", userRouter);
 
