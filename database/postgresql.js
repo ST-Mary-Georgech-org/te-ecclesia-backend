@@ -6,10 +6,6 @@ import OtpEntity from "./entities/Otp.entity.js";
 
 const connectionString = DATABASE_URL;
 
-if (!connectionString) {
-  throw new Error("DATABASE_URL is not defined");
-}
-
 let cached = global.__typeorm__;
 
 if (!cached) {
@@ -21,6 +17,23 @@ if (!cached) {
 }
 
 function createDataSource() {
+  if (!connectionString) {
+    throw new Error("DATABASE_URL is not defined");
+  }
+
+  let parsed;
+  try {
+    parsed = new URL(connectionString);
+  } catch {
+    throw new Error("DATABASE_URL is invalid. Expected a full Postgres URL.");
+  }
+
+  if (!parsed.hostname || parsed.hostname === "base") {
+    throw new Error(
+      "DATABASE_URL host is invalid. Set a real Postgres host in Vercel env vars.",
+    );
+  }
+
   return new DataSource({
     type: "postgres",
     url: connectionString,

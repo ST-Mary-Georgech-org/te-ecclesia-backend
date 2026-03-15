@@ -15,20 +15,3 @@ export async function cleanupExpiredRefreshTokens() {
 
   return UserToken.deleteExpiredBefore(cutoff);
 }
-
-export function startRefreshTokenCleanupScheduler() {
-  if (global.__refresh_token_cleanup_interval__) {
-    return;
-  }
-
-  const intervalId = setInterval(async () => {
-    try {
-      await cleanupExpiredRefreshTokens();
-    } catch (error) {
-      console.error("Refresh token cleanup failed:", error);
-    }
-  }, DEFAULT_CLEANUP_INTERVAL_MS);
-
-  intervalId.unref?.();
-  global.__refresh_token_cleanup_interval__ = intervalId;
-}
