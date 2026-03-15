@@ -21,14 +21,30 @@ app.get("/", (req, res) => {
 });
 
 app.get(DOCS_SPEC_PATH, (req, res) => {
-  return res.status(200).json(swaggerSpec);
+  const forwardedProto = req.headers["x-forwarded-proto"];
+  const protocol =
+    typeof forwardedProto === "string"
+      ? forwardedProto.split(",")[0].trim()
+      : req.protocol;
+  const host = req.headers["x-forwarded-host"] || req.get("host");
+  const origin = `${protocol}://${host}`;
+
+  return res.status(200).json({
+    ...swaggerSpec,
+    servers: [
+      {
+        url: origin,
+        description: "Current server",
+      },
+    ],
+  });
 });
 
 if (isDevelopment) {
   app.use(
     DOCS_PATH,
     swaggerUi.serve,
-    swaggerUi.setup(swaggerSpec, {
+    swaggerUi.setup(undefined, {
       swaggerOptions: {
         url: DOCS_SPEC_PATH,
         validatorUrl: null,
